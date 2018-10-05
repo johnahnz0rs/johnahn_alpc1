@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>John_Ahn_Part1</title>
+        <link rel="shortcut icon" href="./assets/favicon.ico">
+        <link rel="stylesheet" type="text/css" href="./assets/style.css">
+    </head>
+
+    <body>
+
+        <div id="container">
+
+            <h1 id="header">Ayyy Art+Logic Coding Test Part 1 Whoa!</h1>
+
+            <div id="encode" class="inputs">
+                <label>Encode value (base-10)</label>
+                <br><input id="encode-input" type="text" placeholder="range: -8192 to 8191">
+                <br><span id="encode-err" class="err-msg"></span>
+                <br><button onClick="encode(document.getElementById('encode-input').value)">Encode</button>
+                <button onClick="clearEncode()">Clear</button>
+                <p id="encode-result"></p>
+            </div>
+
+            <div id="decode" class="inputs">
+                <label>Decode hexadecimal value<br>(enter Hi and Lo Bytes separately)</label>
+                <br><input id="decode-hi-byte" type="text" placeholder="hiByte (range: 00 to 7F)">
+                <input id="decode-lo-byte" type="text" placeholder="loByte (range: 00 to 7F)">
+                <br><span id="decode-err" class="err-msg"></span>
+                <br><button onClick="decode(document.getElementById('decode-hi-byte').value, document.getElementById('decode-lo-byte').value)">Decode</button>
+                <button onClick="clearDecode()">Clear</button>
+                <p id="decode-result"></p>
+            </div>
+
+        </div>
+
+    </body>
+
+    <script type="text/javascript">
+
+        // i would've liked to use <script src="..."> to load my js file, but since the submission platform doesn't permit .js files, i have my script here.
+
+        function encode(input) {
+
+            // clear prior error message and result;
+            document.getElementById('encode-err').innerHTML = "";
+            document.getElementById('encode-result').innerHTML = "";
+
+            // input validation and err-msg;
+            try {
+                // check that input is a number using type coercion;
+                if (input - 0 != input) {
+                    throw "not a number";
+                }
+                // check for empty string;
+                else if (('' + input).trim().length < 1) {
+                    throw "please enter a number in range (-8192 to 8191)";
+                }
+                // check that input is in range;
+                else if (input < -8192 || input > 8191) {
+                    throw "number is outside of range (-8192 to 8191)";
+                }
+            }
+            // create err-msg if necessary;
+            catch(err) {
+                return document.getElementById('encode-err').innerHTML = `ERROR: ${err}`;
+            }
+
+            // if input is valid, then ENCODE:
+            // add 8192 to raw input to shift range out of negative
+            let inputSum = parseInt(input, 10) + 8192;
+
+            // convert translated decimal input to binary;
+            // then split into hi- and lo-bytes (with preceding 0's);
+            let binary = inputSum.toString(2);
+            while (binary.length < 15) {
+                binary = '0' + binary;
+            }
+            let hiByte = binary.slice(0,8);
+            let loByte = '0' + binary.slice(8);
+
+            // build the encoded returnString in hex;
+            let returnString = '';
+            // add 2-char 0xhiByte (with preceding 0) to returnString;
+            hiByte = parseInt(hiByte, 2).toString(16);
+            hiByte.length < 2 ? returnString += '0' + hiByte : returnString += hiByte;
+            // add 2-char 0xloByte (with preceding 0) to returnString;
+            loByte = parseInt(loByte, 2).toString(16);
+            loByte.length < 2 ? returnString += '0' + loByte : returnString += loByte;
+
+            // // check that returnString has 4-char;
+            // while (returnString.length < 4) {
+            //     returnString = '0' + returnString;
+            // }
+
+            // return the encoded hexadecimal value;
+            return document.getElementById('encode-result').innerHTML = `INPUT: ${input}<br><span class="result">ENCODED: ${returnString.toUpperCase()}</span>`;
+        }
+
+
+        function decode(hiByte, loByte) {
+
+            // clear prior error message and result;
+            document.getElementById('decode-err').innerHTML = "";
+            document.getElementById('decode-result').innerHTML = "";
+
+            // input validation and err-msg;
+            let inputs = [hiByte, loByte];
+            for (let i of inputs) {
+                const a = parseInt(i, 16);
+                try {
+                    // check for empty string;
+                    if (i === '') {
+                        throw "please enter a hexadecimal value in range (0000 to 7F7F)";
+                    }
+                    // check that input is in range;
+                    else if (a > 0x7F || a < 0x00) {
+                        throw "hexadecimal value is outside of range (0000 to 7F7F)";
+                    }
+                    // check that input is hexadecimal;
+                    else if (a !== 0 && i[0] === '0') {
+                        if (a.toString(16) != i[1].toLowerCase()) {
+                            throw "lol not a hexadecimal value";
+                        }
+                    }
+                    // add exception for byte input value of 00;
+                    else if (a !== 0 && a.toString(16) !== i.toLowerCase()) {
+                        throw "rofl not a hexadecimal value";
+                    }
+                }
+                // create err-msg if necessary;
+                catch(err) {
+                    return document.getElementById('decode-err').innerHTML = `ERROR: ${err}`;
+                }
+            }
+
+            // if input is valid, then DECODE:
+            // convert hiByte to binary;
+            let hiB = parseInt(hiByte, 16).toString(2);
+            //convert loByte to binary, and format (handle preceding 0);
+            let loB = parseInt(loByte, 16).toString(2);
+            while (loB.length < 7) {
+                loB = '0' + loB;
+            }
+            // create 4-char binary value to decode, then decode;
+            let formattedBinaryInput = hiB + loB;
+            let returnString = (parseInt(formattedBinaryInput, 2) - 8192).toString(10);
+
+            // return the decoded decimal value;
+            if (hiByte.length < 2) { hiByte = '0' + hiByte; }
+            if (loByte.length < 2) { loByte = '0' + loByte; }
+            return document.getElementById('decode-result').innerHTML = `INPUT: ${hiByte.toUpperCase()}${loByte.toUpperCase()}<br><span class="result">DECODED: ${returnString}</span>`;
+        }
+
+        function clearEncode() {
+            // clear/reset the encode section's text input, err-msg, and result;
+            document.getElementById('encode-input').value = '';
+            document.getElementById('encode-err').innerHTML = '';
+            document.getElementById('encode-result').innerHTML = '';
+        }
+
+        function clearDecode() {
+            // clear/reset the decode section's text inputs, err-msg, and result;
+            document.getElementById('decode-hi-byte').value = '';
+            document.getElementById('decode-lo-byte').value = '';
+            document.getElementById('decode-err').innerHTML = '';
+            document.getElementById('decode-result').innerHTML = '';
+        }
+    </script>
+
+</html>

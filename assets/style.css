@@ -1,0 +1,55 @@
+body {
+    height: 95vh;
+    width: 95vw;
+}
+body:after {
+    content: '';
+    background-image: url("./jahnzie.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.4;
+    z-index: -1;
+}
+#container {
+    height: 95vh;
+    width: 95vw;
+}
+#header {
+    margin: 20px auto;
+    text-align: center;
+}
+.err-msg {
+    color: red;
+    text-align: center;
+}
+input {
+    height: 20px;
+}
+label {
+    font-weight: bold;
+}
+.inputs {
+    display: block;
+    text-align: center;
+    border: 1px solid black;
+    padding: 10px;
+    overflow: hidden;
+    max-width: 50%;
+    margin: 20px auto;
+}
+#encode {
+    margin-top: 150px;
+}
+button {
+    margin-right: 10px;
+}
+.result {
+    font-weight: bold;
+    font-size: large;
+}
